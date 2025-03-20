@@ -1,38 +1,25 @@
-﻿using Lab2_KPO.Data;
-using Lab2_KPO.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Text;
+﻿using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Lab2_KPO.Models;
+using Lab2_KPO.Data;
+using Lab2_KPO.Models;
+using Lab2_KPO;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lab2_KPO
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
             LoadData();
-            SetupContextMenu();
 
+            // Подписываемся на событие изменения данных
             AppDbContext.DataChanged += OnDataChanged;
         }
 
-        private void OnDataChanged()
-        {
-            LoadData();
-        }
-
+        // Метод для загрузки данных
         private void LoadData()
         {
             using (var context = new AppDbContext())
@@ -45,65 +32,19 @@ namespace Lab2_KPO
             }
         }
 
-        protected override void OnClosed(EventArgs e)
+        // Обработчик события изменения данных
+        private void OnDataChanged()
         {
-            AppDbContext.DataChanged -= OnDataChanged;
-            base.OnClosed(e);
+            LoadData();
         }
 
-        private void SetupContextMenu()
-        {
-            var contextMenu = new ContextMenu();
-
-            // Меню для факультетов
-            var addFacultyMenuItem = new MenuItem { Header = "Добавить факультет" };
-            addFacultyMenuItem.Click += AddFaculty_Click;
-            contextMenu.Items.Add(addFacultyMenuItem);
-
-            var editFacultyMenuItem = new MenuItem { Header = "Изменить данные факультета" };
-            editFacultyMenuItem.Click += EditFaculty_Click;
-            contextMenu.Items.Add(editFacultyMenuItem);
-
-            var deleteFacultyMenuItem = new MenuItem { Header = "Удалить факультет" };
-            deleteFacultyMenuItem.Click += DeleteFaculty_Click;
-            contextMenu.Items.Add(deleteFacultyMenuItem);
-
-            // Меню для групп
-            var addGroupMenuItem = new MenuItem { Header = "Добавить группу" };
-            addGroupMenuItem.Click += AddGroup_Click;
-            contextMenu.Items.Add(addGroupMenuItem);
-
-            var editGroupMenuItem = new MenuItem { Header = "Изменить данные группы" };
-            editGroupMenuItem.Click += EditGroup_Click;
-            contextMenu.Items.Add(editGroupMenuItem);
-
-            var deleteGroupMenuItem = new MenuItem { Header = "Удалить группу" };
-            deleteGroupMenuItem.Click += DeleteGroup_Click;
-            contextMenu.Items.Add(deleteGroupMenuItem);
-
-            // Меню для студентов
-            var addStudentMenuItem = new MenuItem { Header = "Добавить студента" };
-            addStudentMenuItem.Click += AddStudent_Click;
-            contextMenu.Items.Add(addStudentMenuItem);
-
-            var editStudentMenuItem = new MenuItem { Header = "Изменить данные студента" };
-            editStudentMenuItem.Click += EditStudent_Click;
-            contextMenu.Items.Add(editStudentMenuItem);
-
-            var deleteStudentMenuItem = new MenuItem { Header = "Удалить студента" };
-            deleteStudentMenuItem.Click += DeleteStudent_Click;
-            contextMenu.Items.Add(deleteStudentMenuItem);
-
-            MainTreeView.ContextMenu = contextMenu;
-        }
-
-        // CRUD для факультетов
+        // CRUD операции для факультетов
         private void AddFaculty_Click(object sender, RoutedEventArgs e)
         {
             var form = new FacultyForm();
             if (form.ShowDialog() == true)
             {
-                LoadData();
+                AppDbContext.NotifyDataChanged();
             }
         }
 
@@ -115,7 +56,7 @@ namespace Lab2_KPO
                 var form = new FacultyForm(selectedFaculty);
                 if (form.ShowDialog() == true)
                 {
-                    LoadData();
+                    AppDbContext.NotifyDataChanged();
                 }
             }
         }
@@ -127,7 +68,7 @@ namespace Lab2_KPO
             {
                 var result = MessageBox.Show(
                     $"Вы уверены, что хотите удалить факультет '{selectedFaculty.Title}'?",
-                    "Подтвердить",
+                    "Подтверждение удаления",
                     MessageBoxButton.YesNo);
 
                 if (result == MessageBoxResult.Yes)
@@ -137,11 +78,12 @@ namespace Lab2_KPO
                         context.Faculties.Remove(selectedFaculty);
                         context.SaveChanges();
                     }
-                    LoadData();
+                    AppDbContext.NotifyDataChanged();
                 }
             }
         }
 
+        // CRUD операции для групп
         private void AddGroup_Click(object sender, RoutedEventArgs e)
         {
             var selectedFaculty = MainTreeView.SelectedItem as Faculty;
@@ -150,12 +92,12 @@ namespace Lab2_KPO
                 var form = new GroupForm();
                 if (form.ShowDialog() == true)
                 {
-                    LoadData();
+                    AppDbContext.NotifyDataChanged();
                 }
             }
             else
             {
-                MessageBox.Show("Выберете факультет для добавления группы.");
+                MessageBox.Show("Выберите факультет для добавления группы.");
             }
         }
 
@@ -167,7 +109,7 @@ namespace Lab2_KPO
                 var form = new GroupForm(selectedGroup);
                 if (form.ShowDialog() == true)
                 {
-                    LoadData();
+                    AppDbContext.NotifyDataChanged();
                 }
             }
         }
@@ -179,7 +121,7 @@ namespace Lab2_KPO
             {
                 var result = MessageBox.Show(
                     $"Вы уверены, что хотите удалить группу '{selectedGroup.Title}'?",
-                    "Подтвердить",
+                    "Подтверждение удаления",
                     MessageBoxButton.YesNo);
 
                 if (result == MessageBoxResult.Yes)
@@ -189,12 +131,12 @@ namespace Lab2_KPO
                         context.Groups.Remove(selectedGroup);
                         context.SaveChanges();
                     }
-                    LoadData();
+                    AppDbContext.NotifyDataChanged();
                 }
             }
         }
 
-        // CRUD для студентов
+        // CRUD операции для студентов
         private void AddStudent_Click(object sender, RoutedEventArgs e)
         {
             var selectedGroup = MainTreeView.SelectedItem as Group;
@@ -203,12 +145,12 @@ namespace Lab2_KPO
                 var form = new StudentForm();
                 if (form.ShowDialog() == true)
                 {
-                    LoadData();
+                    AppDbContext.NotifyDataChanged();
                 }
             }
             else
             {
-                MessageBox.Show("Выберете группу для добавления студента.");
+                MessageBox.Show("Выберите группу для добавления студента.");
             }
         }
 
@@ -220,7 +162,7 @@ namespace Lab2_KPO
                 var form = new StudentForm(selectedStudent);
                 if (form.ShowDialog() == true)
                 {
-                    LoadData();
+                    AppDbContext.NotifyDataChanged();
                 }
             }
         }
@@ -232,7 +174,7 @@ namespace Lab2_KPO
             {
                 var result = MessageBox.Show(
                     $"Вы уверены, что хотите удалить студента '{selectedStudent.Name} {selectedStudent.Surname}'?",
-                    "Подтвердить",
+                    "Подтверждение удаления",
                     MessageBoxButton.YesNo);
 
                 if (result == MessageBoxResult.Yes)
@@ -242,9 +184,16 @@ namespace Lab2_KPO
                         context.Students.Remove(selectedStudent);
                         context.SaveChanges();
                     }
-                    LoadData();
+                    AppDbContext.NotifyDataChanged();
                 }
             }
+        }
+
+        // Отписываемся от события при закрытии окна
+        protected override void OnClosed(EventArgs e)
+        {
+            AppDbContext.DataChanged -= OnDataChanged;
+            base.OnClosed(e);
         }
     }
 }

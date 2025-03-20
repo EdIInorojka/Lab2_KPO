@@ -8,8 +8,9 @@ namespace Lab2_KPO.Models
 {
     public class Faculty
     {
+
         public int Id { get; set; }
         public string Title { get; set; }
-        public ICollection<Group> Groups { get; set; } = new List<Group>();
+        public ICollection<Group> Groups { get; set; }
     }
 }

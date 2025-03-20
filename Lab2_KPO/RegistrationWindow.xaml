@@ -1,0 +1,18 @@
+﻿<Window x:Class="Lab2_KPO.RegistrationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Registration" Height="300" Width="400">
+    <StackPanel Margin="10">
+        <Label Content="Username:"/>
+        <TextBox x:Name="UsernameTextBox"/>
+        <Label Content="Password:"/>
+        <PasswordBox x:Name="PasswordBox"/>
+        <Label Content="Confirm Password:"/>
+        <PasswordBox x:Name="ConfirmPasswordBox"/>
+        
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Button Content="Register" Margin="5" Padding="10,5" Click="RegisterButton_Click"/>
+            <Button Content="Вернуться" Margin="5" Padding="10,5" Click="ReturnToLogin_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
